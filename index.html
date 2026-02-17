@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Alvøen Interiør — Bergen</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=IM+Fell+English:ital@0;1&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --ink:        #1a1612;
+      --iron:       #2c2820;
+      --timber:     #4a3728;
+      --walnut:     #6b4f38;
+      --oak:        #9a7a58;
+      --birch:      #c8ad8a;
+      --linen:      #e8dece;
+      --parchment:  #f2ebe0;
+      --moss:       #3a4a30;
+      --fern:       #4e6040;
+      --sage:       #7a8c68;
+      --rust:       #8c4a2a;
+      --ember:      #b05a30;
+      --forge:      #c87840;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--parchment);
+      color: var(--ink);
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Grain overlay */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 1000; opacity: 0.35;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      width: 8px; height: 8px;
+      background: var(--forge);
+      border-radius: 50%;
+      position: fixed; pointer-events: none; z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.25s, height 0.25s;
+    }
+    .cursor-ring {
+      width: 32px; height: 32px;
+      border: 1px solid var(--walnut);
+      border-radius: 50%;
+      position: fixed; pointer-events: none; z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: all 0.15s ease;
+      opacity: 0.5;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 2rem 5rem;
+      transition: background 0.5s, padding 0.4s;
+    }
+    nav.scrolled {
+      background: rgba(26, 22, 18, 0.96);
+      backdrop-filter: blur(10px);
+      padding: 1.2rem 5rem;
+      border-bottom: 1px solid rgba(154, 122, 88, 0.2);
+    }
+    .nav-logo { display: flex; flex-direction: column; gap: 0.1rem; text-decoration: none; }
+    .nav-logo-main {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem; font-weight: 500;
+      letter-spacing: 0.15em; color: var(--parchment); text-transform: uppercase;
+    }
+    .nav-logo-sub {
+      font-family: 'IM Fell English', serif;
+      font-size: 0.65rem; font-style: italic;
+      color: var(--birch); letter-spacing: 0.12em;
+    }
+    .nav-links { display: flex; gap: 3rem; list-style: none; }
+    .nav-links a {
+      font-size: 0.7rem; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--birch);
+      text-decoration: none; transition: color 0.3s; position: relative;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -5px; left: 0;
+      width: 0; height: 1px; background: var(--forge); transition: width 0.4s ease;
+    }
+    .nav-links a:hover { color: var(--parchment); }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-cta {
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--ink); background: var(--birch);
+      padding: 0.7rem 1.6rem; text-decoration: none; transition: background 0.3s;
+    }
+    .nav-cta:hover { background: var(--forge); color: var(--parchment); }
+
+    /* ─── HERO ─── */
+    .hero {
+      height: 100vh; min-height: 700px;
+      position: relative; overflow: hidden; display: flex; align-items: flex-end;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(to bottom, rgba(26,22,18,0.3) 0%, rgba(26,22,18,0.72) 100%),
+        linear-gradient(135deg, #2c2416 0%, #3d2e1e 30%, #1e2818 60%, #2a1e14 100%);
+    }
+    .hero-texture {
+      position: absolute; inset: 0; opacity: 0.12;
+      background-image:
+        repeating-linear-gradient(92deg, transparent 0px, transparent 18px, rgba(154,122,88,0.4) 18px, rgba(154,122,88,0.4) 19px, transparent 19px, transparent 42px, rgba(106,79,56,0.3) 42px, rgba(106,79,56,0.3) 43px),
+        repeating-linear-gradient(178deg, transparent 0px, transparent 60px, rgba(154,122,88,0.15) 60px, rgba(154,122,88,0.15) 62px);
+    }
+    .hero-iron-tl, .hero-iron-br {
+      position: absolute; width: 180px; height: 180px; opacity: 0.25;
+    }
+    .hero-iron-tl { top: 80px; left: 40px; }
+    .hero-iron-br { bottom: 40px; right: 40px; transform: rotate(180deg); }
+
+    .hero-content {
+      position: relative; z-index: 2;
+      padding: 0 5rem 7rem; max-width: 800px;
+    }
+    .hero-eyebrow {
+      display: flex; align-items: center; gap: 1.2rem; margin-bottom: 2rem;
+      opacity: 0; animation: fadeUp 1s ease 0.4s forwards;
+    }
+    .hero-eyebrow-line { width: 40px; height: 1px; background: var(--forge); }
+    .hero-eyebrow span {
+      font-family: 'IM Fell English', serif;
+      font-size: 0.8rem; font-style: italic; color: var(--forge); letter-spacing: 0.12em;
+    }
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3.5rem, 7vw, 7.5rem);
+      font-weight: 400; line-height: 1; color: var(--parchment); margin-bottom: 2.5rem;
+      opacity: 0; animation: fadeUp 1.1s ease 0.6s forwards;
+    }
+    .hero-title .line2 { font-style: italic; color: var(--birch); display: block; padding-left: 3rem; }
+    .hero-title .line3 { display: block; }
+    .hero-desc {
+      font-family: 'IM Fell English', serif;
+      font-size: 1.05rem; font-style: italic; line-height: 1.85; color: var(--linen);
+      max-width: 480px; margin-bottom: 3.5rem;
+      opacity: 0; animation: fadeUp 1s ease 0.9s forwards;
+    }
+    .hero-actions {
+      display: flex; gap: 1.5rem; align-items: center;
+      opacity: 0; animation: fadeUp 1s ease 1.1s forwards;
+    }
+    .btn-forge {
+      background: var(--forge); color: var(--ink);
+      padding: 1rem 2.8rem;
+      font-family: 'Jost', sans-serif; font-size: 0.7rem; font-weight: 500;
+      letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; border: none;
+      transition: background 0.3s, transform 0.3s; cursor: none; display: inline-block;
+    }
+    .btn-forge:hover { background: var(--ember); transform: translateY(-2px); }
+    .btn-outline {
+      padding: 1rem 2.8rem; font-size: 0.7rem; font-weight: 400;
+      letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none;
+      color: var(--linen); border: 1px solid rgba(200,173,138,0.4);
+      transition: border-color 0.3s, color 0.3s; display: inline-block;
+    }
+    .btn-outline:hover { border-color: var(--birch); color: var(--parchment); }
+    .hero-scroll-hint {
+      position: absolute; bottom: 3rem; right: 5rem;
+      display: flex; flex-direction: column; align-items: center; gap: 1rem;
+      opacity: 0; animation: fadeIn 1s ease 1.6s forwards;
+    }
+    .hero-scroll-hint span {
+      font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--oak); writing-mode: vertical-rl;
+    }
+    .scroll-bar {
+      width: 1px; height: 70px;
+      background: linear-gradient(to bottom, var(--forge), transparent);
+      animation: scrollPulse 2.5s ease infinite;
+    }
+
+    /* ─── HERITAGE BAND ─── */
+    .heritage-band {
+      background: var(--iron); padding: 5rem;
+      display: grid; grid-template-columns: 1fr 2px 1fr 2px 1fr;
+      gap: 4rem; align-items: center;
+      border-top: 1px solid rgba(154,122,88,0.2);
+      border-bottom: 1px solid rgba(154,122,88,0.2);
+    }
+    .heritage-divider { background: rgba(154,122,88,0.25); height: 80px; }
+    .heritage-item { text-align: center; }
+    .heritage-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.2rem; font-weight: 400; color: var(--forge); line-height: 1;
+    }
+    .heritage-label {
+      font-size: 0.65rem; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--oak); margin-top: 0.5rem;
+    }
+    .heritage-sub {
+      font-family: 'IM Fell English', serif;
+      font-size: 0.75rem; font-style: italic; color: var(--birch); margin-top: 0.3rem;
+    }
+
+    /* ─── MARQUEE ─── */
+    .marquee-wrap { background: var(--moss); padding: 1rem 0; overflow: hidden; }
+    .marquee-track {
+      display: inline-block; white-space: nowrap;
+      animation: marquee 25s linear infinite;
+    }
+    .marquee-track span {
+      font-family: 'IM Fell English', serif; font-size: 0.85rem; font-style: italic;
+      color: var(--sage); margin: 0 2rem; letter-spacing: 0.08em;
+    }
+    .marquee-track .sep { color: var(--fern); font-style: normal; font-size: 0.6rem; vertical-align: middle; }
+
+    /* ─── SHARED SECTION ─── */
+    .section-eyebrow { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+    .eyebrow-line { width: 30px; height: 1px; background: var(--forge); }
+    .eyebrow-text { font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--forge); }
+    .section-heading {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.2rem, 3.5vw, 3.8rem); font-weight: 400; line-height: 1.1; color: var(--ink);
+    }
+    .section-heading em { font-style: italic; color: var(--walnut); }
+    .section-heading-light { color: var(--parchment); }
+    .section-heading-light em { color: var(--birch); }
+
+    /* ─── STORY ─── */
+    .story-wrap { padding: 9rem 5rem; background: var(--parchment); }
+    .story { display: grid; grid-template-columns: 1fr 1fr; gap: 9rem; align-items: center; }
+    .story-visual { position: relative; height: 580px; }
+    .story-img-main {
+      position: absolute; top: 0; left: 0; width: 72%; height: 80%;
+      background: linear-gradient(160deg, #3d2e1e 0%, #2a1e10 100%); overflow: hidden;
+    }
+    .story-img-main::after {
+      content: ''; position: absolute; inset: 0;
+      background: repeating-linear-gradient(94deg, transparent 0, transparent 12px, rgba(154,122,88,0.08) 12px, rgba(154,122,88,0.08) 13px, transparent 13px, transparent 28px);
+    }
+    .story-img-main svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .story-img-accent {
+      position: absolute; bottom: 0; right: 0; width: 52%; height: 50%;
+      background: linear-gradient(145deg, #4a3728, #3a2818);
+      border: 5px solid var(--parchment);
+    }
+    .story-badge {
+      position: absolute; bottom: 30%; left: 56%; transform: translateX(-50%);
+      width: 120px; height: 120px; border-radius: 50%;
+      background: var(--ink); border: 1px solid rgba(154,122,88,0.4);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 3;
+    }
+    .story-badge-year { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--forge); line-height: 1; }
+    .story-badge-text { font-size: 0.5rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--oak); text-align: center; margin-top: 0.3rem; }
+    .story-text .section-heading { margin-bottom: 2rem; }
+    .story-body { font-family: 'IM Fell English', serif; font-size: 1rem; font-style: italic; line-height: 1.95; color: var(--walnut); margin-bottom: 1.5rem; }
+    .story-body-plain { font-size: 0.85rem; line-height: 1.95; color: var(--timber); margin-bottom: 2.5rem; }
+    .story-detail { display: flex; align-items: center; gap: 1rem; padding: 1.8rem 0; border-top: 1px solid rgba(154,122,88,0.2); }
+    .story-detail-icon { font-size: 1.2rem; color: var(--forge); width: 30px; text-align: center; }
+    .story-detail-text { font-size: 0.8rem; color: var(--timber); line-height: 1.6; }
+    .story-detail-text strong { display: block; font-weight: 500; color: var(--ink); font-size: 0.82rem; margin-bottom: 0.1rem; }
+
+    /* ─── CATALOG ─── */
+    .catalog { padding: 9rem 5rem; background: var(--iron); }
+    .catalog-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 5rem; }
+    .catalog-grid { display: grid; grid-template-columns: repeat(12, 1fr); grid-template-rows: auto auto; gap: 1.5rem; }
+    .p-card { background: var(--ink); overflow: hidden; cursor: none; position: relative; }
+    .p-card:nth-child(1) { grid-column: span 5; }
+    .p-card:nth-child(2) { grid-column: span 4; }
+    .p-card:nth-child(3) { grid-column: span 3; }
+    .p-card:nth-child(4) { grid-column: span 3; }
+    .p-card:nth-child(5) { grid-column: span 5; }
+    .p-card:nth-child(6) { grid-column: span 4; }
+    .p-img { width: 100%; overflow: hidden; position: relative; transition: transform 0.6s ease; }
+    .p-card:nth-child(1) .p-img, .p-card:nth-child(5) .p-img { aspect-ratio: 4/3; }
+    .p-card:nth-child(2) .p-img, .p-card:nth-child(4) .p-img, .p-card:nth-child(6) .p-img { aspect-ratio: 3/2; }
+    .p-card:nth-child(3) .p-img { aspect-ratio: 2/3; }
+    .p-card:nth-child(1) .p-img { background: linear-gradient(150deg, #3d2e1e 0%, #5a3e28 60%, #2e2010 100%); }
+    .p-card:nth-child(2) .p-img { background: linear-gradient(140deg, #2a2010 0%, #4a3420 100%); }
+    .p-card:nth-child(3) .p-img { background: linear-gradient(160deg, #3a2c1a 0%, #4e3825 100%); }
+    .p-card:nth-child(4) .p-img { background: linear-gradient(150deg, #251c10 0%, #3e2e1c 100%); }
+    .p-card:nth-child(5) .p-img { background: linear-gradient(140deg, #2e2418 0%, #503c28 100%); }
+    .p-card:nth-child(6) .p-img { background: linear-gradient(160deg, #201810 0%, #3a2a18 100%); }
+    .p-img-inner { position: absolute; inset: 0; background: repeating-linear-gradient(91deg, transparent 0, transparent 15px, rgba(154,122,88,0.05) 15px, rgba(154,122,88,0.05) 16px); }
+    .p-card:hover .p-img { transform: scale(1.04); }
+    .p-overlay { position: absolute; inset: 0; background: rgba(26,22,18,0); display: flex; align-items: center; justify-content: center; transition: background 0.4s; }
+    .p-card:hover .p-overlay { background: rgba(26,22,18,0.5); }
+    .p-overlay-btn {
+      background: var(--forge); color: var(--ink); padding: 0.7rem 1.8rem;
+      font-size: 0.65rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none;
+      opacity: 0; transform: translateY(8px); transition: opacity 0.3s, transform 0.3s;
+    }
+    .p-card:hover .p-overlay-btn { opacity: 1; transform: translateY(0); }
+    .p-info { padding: 1.4rem 1.6rem; }
+    .p-cat { font-size: 0.58rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--oak); margin-bottom: 0.4rem; }
+    .p-name { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--linen); margin-bottom: 0.4rem; }
+    .p-mat { font-family: 'IM Fell English', serif; font-size: 0.78rem; font-style: italic; color: var(--oak); margin-bottom: 0.6rem; }
+    .p-price { font-size: 0.8rem; color: var(--birch); }
+    .p-price strong { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--forge); }
+
+    /* ─── CRAFT ─── */
+    .craft-wrap { padding: 9rem 5rem; background: var(--parchment); }
+    .craft { display: grid; grid-template-columns: 1.1fr 1fr; gap: 9rem; align-items: center; }
+    .craft-text .section-heading { margin-bottom: 2.5rem; }
+    .craft-intro { font-family: 'IM Fell English', serif; font-size: 1rem; font-style: italic; line-height: 1.95; color: var(--walnut); margin-bottom: 1.5rem; }
+    .craft-body { font-size: 0.85rem; line-height: 1.95; color: var(--timber); margin-bottom: 3rem; }
+    .craft-materials { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .material-pill { display: flex; align-items: center; gap: 1rem; padding: 1.2rem 1.4rem; background: var(--linen); border-left: 3px solid var(--forge); }
+    .material-icon { font-size: 1.3rem; }
+    .material-name { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.08em; color: var(--ink); }
+    .material-origin { font-family: 'IM Fell English', serif; font-size: 0.7rem; font-style: italic; color: var(--oak); }
+    .craft-visual { position: relative; height: 560px; }
+    .craft-block-1 { position: absolute; top: 0; right: 0; width: 70%; height: 65%; background: linear-gradient(155deg, #4a3728, #2c1e10); }
+    .craft-block-2 { position: absolute; bottom: 0; left: 0; width: 58%; height: 50%; background: linear-gradient(145deg, #3a2c1a, #1e1408); border: 5px solid var(--parchment); }
+    .craft-iron-deco { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100px; height: 200px; z-index: 3; opacity: 0.7; }
+
+    /* ─── SERVICES ─── */
+    .services { padding: 9rem 5rem; background: var(--ink); }
+    .services-header { margin-bottom: 5rem; }
+    .services-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: rgba(154,122,88,0.15); }
+    .svc-item {
+      background: var(--ink); padding: 3.5rem;
+      border: 1px solid rgba(154,122,88,0.1);
+      transition: background 0.4s; cursor: none; position: relative; overflow: hidden;
+    }
+    .svc-item::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 0; background: var(--forge); transition: height 0.5s ease; }
+    .svc-item:hover { background: rgba(74,55,40,0.3); }
+    .svc-item:hover::before { height: 100%; }
+    .svc-num { font-family: 'Playfair Display', serif; font-size: 3.5rem; font-weight: 400; color: rgba(154,122,88,0.15); line-height: 1; margin-bottom: 1.8rem; transition: color 0.4s; }
+    .svc-item:hover .svc-num { color: rgba(200,120,64,0.3); }
+    .svc-icon { font-size: 1.4rem; margin-bottom: 1rem; }
+    .svc-name { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 400; color: var(--linen); margin-bottom: 1rem; }
+    .svc-desc { font-size: 0.83rem; line-height: 1.9; color: var(--oak); }
+
+    /* ─── JOURNAL ─── */
+    .journal { padding: 9rem 5rem; background: var(--iron); }
+    .journal-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 5rem; }
+    .journal-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2rem; }
+    .j-featured { cursor: none; }
+    .j-featured-img { aspect-ratio: 16/9; background: linear-gradient(145deg, #2a2010 0%, #3e2c18 100%); margin-bottom: 2rem; overflow: hidden; position: relative; }
+    .j-featured-img::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(93deg, transparent 0, transparent 20px, rgba(154,122,88,0.04) 20px, rgba(154,122,88,0.04) 21px); }
+    .j-tag { font-size: 0.58rem; letter-spacing: 0.28em; text-transform: uppercase; margin-bottom: 0.8rem; }
+    .j-tag.green { color: var(--sage); }
+    .j-tag.amber { color: var(--forge); }
+    .j-featured-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 400; color: var(--linen); line-height: 1.25; margin-bottom: 1rem; transition: color 0.3s; }
+    .j-featured:hover .j-featured-title { color: var(--birch); }
+    .j-featured-excerpt { font-family: 'IM Fell English', serif; font-size: 0.88rem; font-style: italic; color: var(--oak); line-height: 1.8; margin-bottom: 1rem; }
+    .j-meta { font-size: 0.7rem; color: var(--walnut); letter-spacing: 0.05em; }
+    .j-list { display: flex; flex-direction: column; }
+    .j-item { display: grid; grid-template-columns: 110px 1fr; gap: 1.5rem; padding: 2rem 0; border-bottom: 1px solid rgba(154,122,88,0.12); cursor: none; transition: padding-left 0.3s; }
+    .j-item:first-child { border-top: 1px solid rgba(154,122,88,0.12); }
+    .j-item:hover { padding-left: 0.5rem; }
+    .j-thumb { aspect-ratio: 1; background: linear-gradient(145deg, #2c2010, #3a2a18); }
+    .j-item:nth-child(2) .j-thumb { background: linear-gradient(145deg, #1e1c10, #302818); }
+    .j-item:nth-child(3) .j-thumb { background: linear-gradient(145deg, #251a10, #3a2a1c); }
+    .j-item-title { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--linen); line-height: 1.3; margin-bottom: 0.5rem; transition: color 0.3s; }
+    .j-item:hover .j-item-title { color: var(--birch); }
+    .j-item-meta { font-size: 0.68rem; color: var(--oak); }
+
+    /* ─── CONTACT ─── */
+    .contact-wrap { padding: 9rem 5rem; background: var(--parchment); }
+    .contact { display: grid; grid-template-columns: 1fr 1fr; gap: 9rem; align-items: start; }
+    .contact-info .section-heading { margin-bottom: 2rem; }
+    .contact-intro { font-family: 'IM Fell English', serif; font-size: 1rem; font-style: italic; line-height: 1.9; color: var(--walnut); margin-bottom: 2.5rem; }
+    .contact-details { display: flex; flex-direction: column; }
+    .c-detail { display: grid; grid-template-columns: 50px 1fr; gap: 1.5rem; align-items: center; padding: 1.5rem 0; border-bottom: 1px solid rgba(154,122,88,0.2); }
+    .c-detail:first-child { border-top: 1px solid rgba(154,122,88,0.2); }
+    .c-icon { width: 44px; height: 44px; background: var(--linen); border: 1px solid rgba(154,122,88,0.3); display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+    .c-label { font-size: 0.58rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--forge); display: block; margin-bottom: 0.2rem; }
+    .c-value { font-size: 0.85rem; color: var(--timber); }
+    .contact-form { display: flex; flex-direction: column; gap: 1.8rem; }
+    .f-group { display: flex; flex-direction: column; gap: 0.5rem; }
+    .f-group label { font-size: 0.58rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--walnut); }
+    .f-group input, .f-group select, .f-group textarea { background: transparent; border: none; border-bottom: 1px solid rgba(154,122,88,0.35); padding: 0.8rem 0; font-family: 'Jost', sans-serif; font-size: 0.9rem; color: var(--ink); outline: none; transition: border-color 0.3s; cursor: none; }
+    .f-group input:focus, .f-group select:focus, .f-group textarea:focus { border-color: var(--forge); }
+    .f-group input::placeholder, .f-group textarea::placeholder { color: var(--birch); }
+    .f-group textarea { resize: none; height: 90px; }
+    .f-row { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+
+    /* ─── FOOTER ─── */
+    footer { background: var(--ink); padding: 6rem 5rem 3rem; border-top: 1px solid rgba(154,122,88,0.15); }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 5rem; padding-bottom: 5rem; border-bottom: 1px solid rgba(154,122,88,0.12); margin-bottom: 3rem; }
+    .footer-brand-name { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 500; letter-spacing: 0.15em; color: var(--parchment); display: block; margin-bottom: 0.4rem; }
+    .footer-brand-loc { font-family: 'IM Fell English', serif; font-size: 0.75rem; font-style: italic; color: var(--oak); margin-bottom: 1.5rem; display: block; }
+    .footer-tagline { font-family: 'IM Fell English', serif; font-style: italic; font-size: 0.88rem; color: var(--walnut); line-height: 1.8; }
+    .f-col h4 { font-size: 0.58rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--forge); margin-bottom: 2rem; }
+    .f-col ul { list-style: none; display: flex; flex-direction: column; gap: 1rem; }
+    .f-col ul a { font-size: 0.82rem; color: var(--oak); text-decoration: none; transition: color 0.3s; }
+    .f-col ul a:hover { color: var(--birch); }
+    .footer-bottom { display: flex; justify-content: space-between; align-items: center; }
+    .footer-copy { font-size: 0.7rem; color: var(--walnut); }
+    .footer-social { display: flex; gap: 2rem; }
+    .footer-social a { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--walnut); text-decoration: none; transition: color 0.3s; }
+    .footer-social a:hover { color: var(--forge); }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    @keyframes scrollPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    .reveal { opacity: 0; transform: translateY(36px); transition: opacity 0.9s ease, transform 0.9s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.15s; }
+    .reveal-delay-2 { transition-delay: 0.3s; }
+    a { cursor: none; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 960px) {
+      nav, nav.scrolled { padding: 1.5rem 2rem; }
+      .nav-links, .nav-cta { display: none; }
+      .hero-content { padding: 0 2rem 5rem; }
+      .hero-iron-tl, .hero-iron-br { display: none; }
+      .heritage-band { grid-template-columns: 1fr; padding: 3rem 2rem; gap: 2rem; }
+      .heritage-divider { display: none; }
+      .story-wrap, .craft-wrap, .contact-wrap { padding: 5rem 2rem; }
+      .story, .craft, .contact { grid-template-columns: 1fr; gap: 4rem; }
+      .story-visual, .craft-visual { height: 300px; }
+      .catalog { padding: 5rem 2rem; }
+      .catalog-grid { grid-template-columns: 1fr 1fr; }
+      .p-card:nth-child(n) { grid-column: span 1; }
+      .services { padding: 5rem 2rem; }
+      .services-grid { grid-template-columns: 1fr; }
+      .journal { padding: 5rem 2rem; }
+      .journal-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 3rem; }
+      footer { padding: 4rem 2rem 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <a href="#" class="nav-logo">
+      <span class="nav-logo-main">Alvøen Interiør</span>
+      <span class="nav-logo-sub">Bergen, Norge · Est. 2008</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#catalog">Kolleksjon</a></li>
+      <li><a href="#services">Tjenester</a></li>
+      <li><a href="#journal">Journal</a></li>
+      <li><a href="#contact">Kontakt</a></li>
+    </ul>
+    <a href="#contact" class="nav-cta">Bestill Konsultasjon</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-texture"></div>
+
+    <svg class="hero-iron-tl" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 10 L10 80 Q10 100 30 100 L80 100" stroke="#c87840" stroke-width="2" fill="none"/>
+      <path d="M10 10 L80 10" stroke="#c87840" stroke-width="2"/>
+      <circle cx="10" cy="10" r="4" fill="#c87840"/>
+      <circle cx="80" cy="10" r="3" fill="#c87840"/>
+      <circle cx="80" cy="100" r="3" fill="#c87840"/>
+      <path d="M30 30 Q50 10 70 30 Q90 50 70 70" stroke="#c87840" stroke-width="1.5" fill="none"/>
+      <path d="M50 10 Q70 30 50 50" stroke="#c87840" stroke-width="1" fill="none" opacity="0.6"/>
+      <circle cx="30" cy="30" r="2.5" fill="none" stroke="#c87840" stroke-width="1"/>
+      <circle cx="70" cy="30" r="2.5" fill="none" stroke="#c87840" stroke-width="1"/>
+      <circle cx="70" cy="70" r="2.5" fill="none" stroke="#c87840" stroke-width="1"/>
+      <path d="M10 50 Q25 40 30 55 Q35 70 20 75" stroke="#c87840" stroke-width="1" fill="none" opacity="0.5"/>
+    </svg>
+    <svg class="hero-iron-br" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 10 L10 80 Q10 100 30 100 L80 100" stroke="#c87840" stroke-width="2" fill="none"/>
+      <path d="M10 10 L80 10" stroke="#c87840" stroke-width="2"/>
+      <circle cx="10" cy="10" r="4" fill="#c87840"/>
+      <circle cx="80" cy="10" r="3" fill="#c87840"/>
+      <circle cx="80" cy="100" r="3" fill="#c87840"/>
+      <path d="M30 30 Q50 10 70 30 Q90 50 70 70" stroke="#c87840" stroke-width="1.5" fill="none"/>
+      <circle cx="30" cy="30" r="2.5" fill="none" stroke="#c87840" stroke-width="1"/>
+      <circle cx="70" cy="30" r="2.5" fill="none" stroke="#c87840" stroke-width="1"/>
+    </svg>
+
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <div class="hero-eyebrow-line"></div>
+        <span>Alvøen, Bergen · Norsk Håndverk</span>
+      </div>
+      <h1 class="hero-title">
+        Interiør med<br/>
+        <span class="line2">røtter i</span>
+        <span class="line3">tradisjonen</span>
+      </h1>
+      <p class="hero-desc">
+        Klassiske materialer. Norsk håndverk. Stykker som varer
+        — ikke bare i år, men i generasjoner.
+      </p>
+      <div class="hero-actions">
+        <a href="#catalog" class="btn-forge">Utforsk Kolleksjonen</a>
+        <a href="#services" class="btn-outline">Våre Tjenester</a>
+      </div>
+    </div>
+    <div class="hero-scroll-hint">
+      <div class="scroll-bar"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- HERITAGE BAND -->
+  <div class="heritage-band">
+    <div class="heritage-item reveal">
+      <div class="heritage-num">16+</div>
+      <div class="heritage-label">År i Bergen</div>
+      <div class="heritage-sub">Siden 2008</div>
+    </div>
+    <div class="heritage-divider"></div>
+    <div class="heritage-item reveal reveal-delay-1">
+      <div class="heritage-num">400+</div>
+      <div class="heritage-label">Prosjekter Fullført</div>
+      <div class="heritage-sub">Fra Alvøen til Ålesund</div>
+    </div>
+    <div class="heritage-divider"></div>
+    <div class="heritage-item reveal reveal-delay-2">
+      <div class="heritage-num">100%</div>
+      <div class="heritage-label">Norske Leverandører</div>
+      <div class="heritage-sub">Lokalt, alltid</div>
+    </div>
+  </div>
+
+  <!-- MARQUEE -->
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      <span>Eiketre &amp; Valnøtt</span><span class="sep">✦</span>
+      <span>Smidd Jern</span><span class="sep">✦</span>
+      <span>Norsk Håndverk</span><span class="sep">✦</span>
+      <span>Klassisk Arkitektur</span><span class="sep">✦</span>
+      <span>Alvøen, Bergen</span><span class="sep">✦</span>
+      <span>Naturlige Materialer</span><span class="sep">✦</span>
+      <span>Tidløst Design</span><span class="sep">✦</span>
+      <span>Eiketre &amp; Valnøtt</span><span class="sep">✦</span>
+      <span>Smidd Jern</span><span class="sep">✦</span>
+      <span>Norsk Håndverk</span><span class="sep">✦</span>
+      <span>Klassisk Arkitektur</span><span class="sep">✦</span>
+      <span>Alvøen, Bergen</span><span class="sep">✦</span>
+      <span>Naturlige Materialer</span><span class="sep">✦</span>
+      <span>Tidløst Design</span><span class="sep">✦</span>
+    </div>
+  </div>
+
+  <!-- STORY -->
+  <div class="story-wrap">
+    <div class="story reveal">
+      <div class="story-visual">
+        <div class="story-img-main">
+          <!-- Replace with: <img src="images/alvoen-story.jpg" style="width:100%;height:100%;object-fit:cover;"> -->
+          <svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg" opacity="0.55">
+            <path d="M60 220 L150 120 L240 220 Z" stroke="#c87840" stroke-width="2" fill="none"/>
+            <rect x="80" y="220" width="140" height="120" stroke="#c87840" stroke-width="1.5" fill="none"/>
+            <rect x="120" y="270" width="35" height="70" stroke="#c87840" stroke-width="1" fill="none"/>
+            <rect x="165" y="245" width="35" height="35" stroke="#c87840" stroke-width="1" fill="none"/>
+            <line x1="182" y1="245" x2="182" y2="280" stroke="#c87840" stroke-width="0.8"/>
+            <line x1="165" y1="262" x2="200" y2="262" stroke="#c87840" stroke-width="0.8"/>
+            <rect x="36" y="280" width="8" height="60" fill="#9a7a58" opacity="0.6"/>
+            <ellipse cx="40" cy="260" rx="22" ry="30" fill="#4e6040" opacity="0.5"/>
+            <ellipse cx="40" cy="245" rx="16" ry="22" fill="#3a4a30" opacity="0.5"/>
+            <line x1="80" y1="340" x2="80" y2="380" stroke="#c87840" stroke-width="1.5"/>
+            <line x1="100" y1="340" x2="100" y2="380" stroke="#c87840" stroke-width="1.5"/>
+            <line x1="120" y1="340" x2="120" y2="380" stroke="#c87840" stroke-width="1.5"/>
+            <line x1="140" y1="340" x2="140" y2="380" stroke="#c87840" stroke-width="1.5"/>
+            <line x1="80" y1="350" x2="140" y2="350" stroke="#c87840" stroke-width="1"/>
+            <circle cx="80" cy="340" r="3" fill="#c87840"/>
+            <circle cx="100" cy="340" r="3" fill="#c87840"/>
+            <circle cx="120" cy="340" r="3" fill="#c87840"/>
+            <circle cx="140" cy="340" r="3" fill="#c87840"/>
+          </svg>
+        </div>
+        <div class="story-img-accent"></div>
+        <div class="story-badge">
+          <span class="story-badge-year">Alvøen</span>
+          <span class="story-badge-text">Bergen<br/>Norge</span>
+        </div>
+      </div>
+      <div class="story-text">
+        <div class="section-eyebrow">
+          <div class="eyebrow-line"></div>
+          <span class="eyebrow-text">Vår Historie</span>
+        </div>
+        <h2 class="section-heading">Et sted der <em>tradisjon</em><br/>møter hjemmet</h2>
+        <p class="story-body">
+          Alvøen er mer enn en adresse — det er et sted med sjel. Omringet av
+          klassisk trehusarkitektur og smijernsdetaljer har stedet inspirert
+          håndverkere i generasjoner.
+        </p>
+        <p class="story-body-plain">
+          Vår butikk ble grunnlagt med én overbevisning: at et hjem fortjener
+          materialer og stykker av ekte kvalitet. Vi henter eik fra norske skoger,
+          arbeider med lokale smeder og samarbeider kun med leverandører som deler
+          vår respekt for tradisjonelt håndverk.
+        </p>
+        <div class="story-detail">
+          <span class="story-detail-icon">🌲</span>
+          <div class="story-detail-text">
+            <strong>Bærekraftig norsk tre</strong>
+            Eik, ask og bjørk — fra FSC-sertifiserte norske skoger
+          </div>
+        </div>
+        <div class="story-detail">
+          <span class="story-detail-icon">⚒</span>
+          <div class="story-detail-text">
+            <strong>Håndtemplet jern</strong>
+            Smijernsstykker laget av lokale smeder i Bergensregionen
+          </div>
+        </div>
+        <div class="story-detail">
+          <span class="story-detail-icon">🏡</span>
+          <div class="story-detail-text">
+            <strong>Inspirert av Alvøen</strong>
+            Hvert stykke reflekterer den klassiske arkitekturen i vår hjemby
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CATALOG -->
+  <section class="catalog" id="catalog">
+    <div class="catalog-header reveal">
+      <div>
+        <div class="section-eyebrow">
+          <div class="eyebrow-line" style="background:var(--oak)"></div>
+          <span class="eyebrow-text" style="color:var(--oak)">Kolleksjonen</span>
+        </div>
+        <h2 class="section-heading section-heading-light">Utvalgte <em>stykker</em></h2>
+      </div>
+      <a href="catalog.html" class="btn-outline" style="color:var(--birch);border-color:rgba(154,122,88,0.4)">Se hele kolleksjonen →</a>
+    </div>
+    <div class="catalog-grid reveal">
+      <div class="p-card">
+        <div class="p-img"><div class="p-img-inner"></div>
+          <!-- Replace with: <img src="images/stol-eik.jpg" style="width:100%;height:100%;object-fit:cover;"> -->
+          <div class="p-overlay"><a href="#" class="p-overlay-btn">Se Detaljer</a></div>
+        </div>
+        <div class="p-info">
+          <p class="p-cat">Stoler</p>
+          <h3 class="p-name">Bergenstolen — Eik</h3>
+          <p class="p-mat">Massiv norsk eik · Lerretssete</p>
+          <p class="p-price">Fra <strong>kr 8 400</strong></p>
+        </div>
+      </div>
+      <div class="p-card">
+        <div class="p-img"><div class="p-img-inner"></div>
+          <div class="p-overlay"><a href="#" class="p-overlay-btn">Se Detaljer</a></div>
+        </div>
+        <div class="p-info">
+          <p class="p-cat">Belysning</p>
+          <h3 class="p-name">Smijernslykten</h3>
+          <p class="p-mat">Håndtemplet jern · Messing</p>
+          <p class="p-price">Fra <strong>kr 4 200</strong></p>
+        </div>
+      </div>
+      <div class="p-card">
+        <div class="p-img"><div class="p-img-inner"></div>
+          <div class="p-overlay"><a href="#" class="p-overlay-btn">Se Detaljer</a></div>
+        </div>
+        <div class="p-info">
+          <p class="p-cat">Hyller</p>
+          <h3 class="p-name">Alvøen Veggstativ</h3>
+          <p class="p-mat">Jern &amp; Valnøtt</p>
+          <p class="p-price">Fra <strong>kr 3 600</strong></p>
+        </div>
+      </div>
+      <div class="p-card">
+        <div class="p-img"><div class="p-img-inner"></div>
+          <div class="p-overlay"><a href="#" class="p-overlay-btn">Se Detaljer</a></div>
+        </div>
+        <div class="p-info">
+          <p class="p-cat">Bord</p>
+          <h3 class="p-name">Klassisk Spisebord</h3>
+          <p class="p-mat">Massiv ask · Dreide ben</p>
+          <p class="p-price">Fra <strong>kr 22 000</strong></p>
+        </div>
+      </div>
+      <div class="p-card">
+        <div class="p-img"><div class="p-img-inner"></div>
+          <div class="p-overlay"><a href="#" class="p-overlay-btn">Se Detaljer</a></div>
+        </div>
+        <div class="p-info">
+          <p class="p-cat">Tekstiler</p>
+          <h3 class="p-name">Ulltepper — Natur</h3>
+          <p class="p-mat">Norsk ull · Håndvevd</p>
+          <p class="p-price">Fra <strong>kr 2 800</strong></p>
+        </div>
+      </div>
+      <div class="p-card">
+        <div class="p-img"><div class="p-img-inner"></div>
+          <div class="p-overlay"><a href="#" class="p-overlay-btn">Se Detaljer</a></div>
+        </div>
+        <div class="p-info">
+          <p class="p-cat">Dekor</p>
+          <h3 class="p-name">Smijernslysestaker</h3>
+          <p class="p-mat">Håndtemplet jern</p>
+          <p class="p-price">Fra <strong>kr 960</strong></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CRAFT -->
+  <div class="craft-wrap">
+    <div class="craft reveal">
+      <div class="craft-text">
+        <div class="section-eyebrow">
+          <div class="eyebrow-line"></div>
+          <span class="eyebrow-text">Materialer &amp; Håndverk</span>
+        </div>
+        <h2 class="section-heading">Laget for å <em>vare</em></h2>
+        <p class="craft-intro">Vi velger kun materialer som blir vakrere med alderen — tre som får patina, jern som forteller historier.</p>
+        <p class="craft-body">Hvert stykke i vår kolleksjon er laget med respekt for materialet. Norsk eik og ask fra bærekraftige skoger, bearbeidet av håndverkere som fortsetter tradisjoner fra Bergensregionen. Smijern temperert og formet for hånd, slik det har blitt gjort i Alvøen i over hundre år.</p>
+        <div class="craft-materials">
+          <div class="material-pill"><span class="material-icon">🌳</span><div><div class="material-name">Norsk Eik</div><div class="material-origin">Vestland, Norge</div></div></div>
+          <div class="material-pill"><span class="material-icon">⚒️</span><div><div class="material-name">Smidd Jern</div><div class="material-origin">Bergensregionen</div></div></div>
+          <div class="material-pill"><span class="material-icon">🪵</span><div><div class="material-name">Ask &amp; Bjørk</div><div class="material-origin">Lokale skoger</div></div></div>
+          <div class="material-pill"><span class="material-icon">🧶</span><div><div class="material-name">Norsk Ull</div><div class="material-origin">Vestlandsfe</div></div></div>
+        </div>
+      </div>
+      <div class="craft-visual">
+        <div class="craft-block-1"><!-- Replace: <img src="images/craft-1.jpg" style="width:100%;height:100%;object-fit:cover;"> --></div>
+        <div class="craft-block-2"><!-- Replace: <img src="images/craft-2.jpg" style="width:100%;height:100%;object-fit:cover;"> --></div>
+        <svg class="craft-iron-deco" viewBox="0 0 100 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <line x1="50" y1="0" x2="50" y2="200" stroke="#c87840" stroke-width="2"/>
+          <circle cx="50" cy="20" r="8" fill="none" stroke="#c87840" stroke-width="1.5"/>
+          <circle cx="50" cy="20" r="3" fill="#c87840"/>
+          <path d="M50 28 Q30 50 50 65 Q70 80 50 100" stroke="#c87840" stroke-width="1.5" fill="none"/>
+          <path d="M50 28 Q70 50 50 65 Q30 80 50 100" stroke="#c87840" stroke-width="1.5" fill="none"/>
+          <circle cx="50" cy="100" r="6" fill="none" stroke="#c87840" stroke-width="1.5"/>
+          <circle cx="50" cy="100" r="2" fill="#c87840"/>
+          <path d="M50 106 Q30 125 50 140 Q70 155 50 175" stroke="#c87840" stroke-width="1.5" fill="none"/>
+          <path d="M50 106 Q70 125 50 140 Q30 155 50 175" stroke="#c87840" stroke-width="1.5" fill="none"/>
+          <circle cx="50" cy="180" r="5" fill="none" stroke="#c87840" stroke-width="1.5"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- SERVICES -->
+  <section class="services" id="services">
+    <div class="services-header reveal">
+      <div class="section-eyebrow"><div class="eyebrow-line"></div><span class="eyebrow-text">Hva Vi Tilbyr</span></div>
+      <h2 class="section-heading section-heading-light">Våre <em>tjenester</em></h2>
+    </div>
+    <div class="services-grid reveal">
+      <div class="svc-item"><div class="svc-num">01</div><div class="svc-icon">🏡</div><h3 class="svc-name">Interiørdesign</h3><p class="svc-desc">Full service interiørdesign for boliger og næringsbygg i Bergen og omegn. Fra konsept til ferdig rom — med klassisk norsk estetikk som grunnlag.</p></div>
+      <div class="svc-item"><div class="svc-num">02</div><div class="svc-icon">🪑</div><h3 class="svc-name">Møbelkuratering</h3><p class="svc-desc">Vi hjelper deg å velge stykker som passer ditt hjem. Tilgang til hele kolleksjonen vår, inkludert eksklusive stykker som ikke er tilgjengelig i butikk.</p></div>
+      <div class="svc-item"><div class="svc-num">03</div><div class="svc-icon">🔨</div><h3 class="svc-name">Skreddersøm</h3><p class="svc-desc">Bestill møbler og detaljer tilpasset ditt rom og din smak. Arbeider tett med lokale snekker og smeder for å skape unike stykker.</p></div>
+      <div class="svc-item"><div class="svc-num">04</div><div class="svc-icon">💡</div><h3 class="svc-name">Belysningsdesign</h3><p class="svc-desc">Lys former atmosfære. Vi designer belysningsoppsett med smijernslykter og klassiske armaturer som varmer et rom på alle tidspunkter av dagen.</p></div>
+    </div>
+  </section>
+
+  <!-- JOURNAL -->
+  <section class="journal" id="journal">
+    <div class="journal-header reveal">
+      <div>
+        <div class="section-eyebrow"><div class="eyebrow-line" style="background:var(--sage)"></div><span class="eyebrow-text" style="color:var(--sage)">Fra Journalen</span></div>
+        <h2 class="section-heading section-heading-light">Tanker om <em>hjemmet</em></h2>
+      </div>
+      <a href="blog.html" class="btn-outline" style="color:var(--birch);border-color:rgba(154,122,88,0.3)">Les alle innlegg →</a>
+    </div>
+    <div class="journal-grid reveal">
+      <div class="j-featured">
+        <div class="j-featured-img"><!-- Replace: <img src="images/blog-featured.jpg" style="width:100%;height:100%;object-fit:cover;"> --></div>
+        <p class="j-tag green">Håndverk &amp; Tradisjon</p>
+        <h3 class="j-featured-title">Hvorfor smidd jern aldri går av moten — og bare blir bedre med alderen</h3>
+        <p class="j-featured-excerpt">I en tid preget av masseproduksjon og trendstyrt design, er det noe dypt tilfredsstillende ved jern som er templet for hånd i en lokal esse.</p>
+        <p class="j-meta">14. januar 2025 · 7 min lesing</p>
+      </div>
+      <div class="j-list">
+        <div class="j-item">
+          <div class="j-thumb"></div>
+          <div><p class="j-tag amber">Materialer</p><h4 class="j-item-title">Eik, ask og bjørk: Tre norske tresorter og hva de egner seg til</h4><p class="j-item-meta">2. februar 2025 · 5 min</p></div>
+        </div>
+        <div class="j-item">
+          <div class="j-thumb"></div>
+          <div><p class="j-tag green">Alvøen</p><h4 class="j-item-title">Arkitekturen i Alvøen — og hva den lærer oss om tidløst design</h4><p class="j-item-meta">18. desember 2024 · 6 min</p></div>
+        </div>
+        <div class="j-item">
+          <div class="j-thumb"></div>
+          <div><p class="j-tag amber">Interiørtips</p><h4 class="j-item-title">Slik blander du klassiske møbler med et moderne hjem</h4><p class="j-item-meta">5. november 2024 · 4 min</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <div class="contact-wrap" id="contact">
+    <div class="contact reveal">
+      <div class="contact-info">
+        <div class="section-eyebrow"><div class="eyebrow-line"></div><span class="eyebrow-text">Ta Kontakt</span></div>
+        <h2 class="section-heading">La oss skape noe <em>varig</em></h2>
+        <p class="contact-intro">Enten du ser etter ett enkelt stykke eller ønsker å fornye hele hjemmet — vi tar oss tid til å forstå hva du trenger.</p>
+        <div class="contact-details">
+          <div class="c-detail"><div class="c-icon">📍</div><div><span class="c-label">Besøk oss</span><span class="c-value">Alvøen 42, 5179 Bergen</span></div></div>
+          <div class="c-detail"><div class="c-icon">✉</div><div><span class="c-label">E-post</span><span class="c-value">hei@alvoeninterior.no</span></div></div>
+          <div class="c-detail"><div class="c-icon">📞</div><div><span class="c-label">Telefon</span><span class="c-value">+47 55 00 00 00</span></div></div>
+          <div class="c-detail"><div class="c-icon">🕐</div><div><span class="c-label">Åpningstider</span><span class="c-value">Tirsdag–Lørdag, 10–17</span></div></div>
+        </div>
+      </div>
+      <form class="contact-form reveal" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+        <div class="f-row">
+          <div class="f-group"><label>Fornavn</label><input type="text" name="first_name" placeholder="Kari" required/></div>
+          <div class="f-group"><label>Etternavn</label><input type="text" name="last_name" placeholder="Nordmann" required/></div>
+        </div>
+        <div class="f-group"><label>E-postadresse</label><input type="email" name="email" placeholder="kari@eksempel.no" required/></div>
+        <div class="f-group">
+          <label>Jeg er interessert i</label>
+          <select name="service">
+            <option value="">Velg tjeneste...</option>
+            <option>Interiørdesign</option>
+            <option>Møbelkuratering</option>
+            <option>Skreddersydde Møbler</option>
+            <option>Belysningsdesign</option>
+            <option>Generell Forespørsel</option>
+          </select>
+        </div>
+        <div class="f-group"><label>Melding</label><textarea name="message" placeholder="Fortell oss om hjemmet ditt og hva du ser etter..."></textarea></div>
+        <button type="submit" class="btn-forge" style="width:100%;padding:1.2rem;font-size:0.72rem;border:none;">Send Melding</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-grid reveal">
+      <div>
+        <span class="footer-brand-name">Alvøen Interiør</span>
+        <span class="footer-brand-loc">Alvøen · Bergen, Norge</span>
+        <p class="footer-tagline">"Tingene vi omgir oss med<br/>forteller historien om hvem vi er.<br/>Velg med omhu."</p>
+      </div>
+      <div class="f-col">
+        <h4>Navigasjon</h4>
+        <ul>
+          <li><a href="#">Hjem</a></li>
+          <li><a href="#catalog">Kolleksjon</a></li>
+          <li><a href="#services">Tjenester</a></li>
+          <li><a href="#journal">Journal</a></li>
+          <li><a href="#contact">Kontakt</a></li>
+        </ul>
+      </div>
+      <div class="f-col">
+        <h4>Tjenester</h4>
+        <ul>
+          <li><a href="#">Interiørdesign</a></li>
+          <li><a href="#">Skreddersøm</a></li>
+          <li><a href="#">Belysning</a></li>
+          <li><a href="#">Konsultasjon</a></li>
+        </ul>
+      </div>
+      <div class="f-col">
+        <h4>Info</h4>
+        <ul>
+          <li><a href="#">Om oss</a></li>
+          <li><a href="#">Leverandører</a></li>
+          <li><a href="#">Personvern</a></li>
+          <li><a href="#">Alvøen 42, Bergen</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2025 Alvøen Interiør. Alle rettigheter forbeholdt.</p>
+      <div class="footer-social">
+        <a href="#">Instagram</a>
+        <a href="#">Pinterest</a>
+        <a href="#">Facebook</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const cursor = document.getElementById('cursor');
+    const ring   = document.getElementById('cursorRing');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top  = e.clientY + 'px';
+      setTimeout(() => { ring.style.left = e.clientX + 'px'; ring.style.top = e.clientY + 'px'; }, 90);
+    });
+
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 60); });
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
